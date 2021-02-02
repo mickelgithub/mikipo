@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mikipo/framework/auth/auth_repository_impl.dart';
-import 'package:mikipo/ui/auth/auth_widget.dart';
-import 'package:mikipo/ui/auth/viewmodel/auth_view_model.dart';
-import 'package:mikipo/ui/login/login_screen.dart';
+import 'package:mikipo/src/ui/emailnotverified/email_not_verified.dart';
+import 'package:mikipo/src/ui/home/home_screen.dart';
+import 'package:mikipo/src/ui/login/login_screen.dart';
+
 
 
 class RouteGenerator {
@@ -11,12 +11,20 @@ class RouteGenerator {
     final args = settings.arguments;
 
     switch (settings.name) {
-      case '/':
-        return MaterialPageRoute(builder: (_) => AuthWidget(AuthViewModel(AuthRepositoryImpl(FirebaseAuth.instance))));
+      /*case '/':
+        return MaterialPageRoute(builder: (_) => AuthWidget());*/
       case '/login':
       // Validation of correct data type
         return MaterialPageRoute(
           builder: (_) => LoginScreen(),
+        );
+      /*case '/home':
+        return MaterialPageRoute(
+          builder: (_) => HomeScreen(),
+        );*/
+      case '/email_not_verified':
+        return MaterialPageRoute(
+          builder: (_) => EmailNotVerified(),
         );
       default:
         return _errorRoute();

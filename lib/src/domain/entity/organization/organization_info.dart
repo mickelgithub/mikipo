@@ -1,11 +1,12 @@
-import 'package:mikipo/src/domain/entities/organization/heigh_profile.dart';
-import 'package:mikipo/src/domain/entities/organization/section.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mikipo/src/domain/entity/organization/heigh_profile.dart';
+import 'package:mikipo/src/domain/entity/organization/section.dart';
 
-class OrganizationInfo {
+part 'organization_info.freezed.dart';
 
-  final List<Section> sections;
-  final List<HeighProfile> heighProfiles;
+@freezed
+abstract class OrganizationInfo with _$OrganizationInfo {
 
-  OrganizationInfo({this.sections, this.heighProfiles});
+  const factory OrganizationInfo({List<Section> sections, List<HeighProfile> heighProfiles})= _OrganizationInfo;
 
 }

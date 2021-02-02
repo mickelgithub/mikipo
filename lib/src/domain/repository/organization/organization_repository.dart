@@ -1,4 +1,4 @@
-import 'package:mikipo/src/domain/entities/organization/organization_info.dart';
+import 'package:mikipo/src/domain/entity/organization/organization_info.dart';
 
 abstract class IOrganizationRepository {
 

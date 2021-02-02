@@ -1,23 +1,31 @@
-import 'area.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:mikipo/src/domain/entity/organization/area.dart';
 
-class Section {
+part 'section.freezed.dart';
 
-  final id;
-  final String name;
-  final String icon;
-  final List<Area> areas;
+@freezed
+abstract class Section with _$Section {
 
-  Section({this.id, this.name, this.icon, this.areas});
+  static const String ID= 'section_id';
+  static const String NAME= 'section_name';
+  static const String ICON= 'section_icon';
+  static const String AREAS= 'section_areas';
+
+  const factory Section({int id, String name, String icon, List<Area> areas})= _Section;
 
   factory Section.fromMap(Map<String, dynamic> data) {
     final areas= <Area>[];
-    if (data['areas']!= null) {
-      (data['areas'] as List<dynamic>).forEach((e) => areas.add(Area.fromMap({'id': e['id'], 'name': e['name'], 'icon': e['icon'], 'departments': e['departments']})));
+    if (data[AREAS]!= null) {
+      (data[AREAS] as List<dynamic>).forEach((e) =>
+          areas.add(Area.fromMap({Area.ID: e[Area.ID],
+            Area.NAME: e[Area.NAME],
+            Area.ICON: e[Area.ICON],
+            Area.DEPARTMENTS: e[Area.DEPARTMENTS]})));
     }
     return Section(
-        id: data['id'],
-        name: data['name'],
-        icon: data['icon'],
+        id: data[ID],
+        name: data[NAME],
+        icon: data[ICON],
         areas: areas
     );
   }

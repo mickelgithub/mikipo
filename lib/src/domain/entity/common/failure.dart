@@ -1,7 +1,5 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-class Failure {
-  final String message;
-  Failure({this.message});
-}
+abstract class Failure {}

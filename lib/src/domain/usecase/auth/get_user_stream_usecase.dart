@@ -1,12 +1,12 @@
-import 'file:///C:/Users/ldasal4.LINEADIRECTA/StudioProjects/mikipo/lib/src/domain/entity/setting/globalsetting/global_setting.dart';
+import 'package:mikipo/src/domain/entity/auth/user.dart';
 import 'package:mikipo/src/domain/repository/auth/auth_repository.dart';
 
-class GetGlobalSettingStreamUseCase {
+class GetUserStreamUseCase {
 
   final IAuthRepository _authRepository;
 
-  GetGlobalSettingStreamUseCase(this._authRepository);
+  GetUserStreamUseCase(this._authRepository);
 
-  Stream<GlobalSetting> call() => _authRepository.globalSetting;
+  Stream<User> call() => _authRepository.user;
 
 }

@@ -1,12 +1,17 @@
-class Department {
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final int id;
-  final String name;
+part 'department.freezed.dart';
 
-  Department({this.id, this.name});
+@freezed
+abstract class Department with _$Department {
+
+  static const String ID= 'department_id';
+  static const String NAME= 'department_name';
+
+  const factory Department({int id, String name})= _Departments;
 
   factory Department.fromMap(Map<String, dynamic> data) {
-    return Department(id: data['id'], name: data['name']);
+    return Department(id: data[ID], name: data[NAME]);
   }
 
 }
