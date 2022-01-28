@@ -1,5 +1,6 @@
 import 'package:mikipo/src/domain/entity/auth/user.dart';
 import 'package:mikipo/src/domain/entity/common/failure.dart';
+import 'package:mikipo/src/domain/entity/local/local_state_info.dart';
 
 class AuthFailure extends Failure {}
 
@@ -15,4 +16,12 @@ class ChefAlreadyExists extends AuthFailure {
   final User user;
   ChefAlreadyExists(this.user);
 }
+class UserDischarged extends AuthFailure {}
+class UserDisabled extends AuthFailure {}
+class UserEmailNotVerifiedYet extends AuthFailure {}
+class UserNotAuthenticatedButNotNew extends AuthFailure {
+  final LocalStateInfo localStateInfo;
+  UserNotAuthenticatedButNotNew(this.localStateInfo);
+}
+class UserNotAuthenticatedNewInstalation extends AuthFailure {}
 

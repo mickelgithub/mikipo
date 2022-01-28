@@ -14,77 +14,91 @@ import 'package:mikipo/src/util/log/simple_log_printer.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+
   static final _logger = getLogger((HomeScreen).toString());
 
-  final HomeViewModel _viewModel;
-  final User _user;
+  const HomeScreen._();
 
-  const HomeScreen(this._viewModel, this._user);
+  static Widget getHomeScreen(
+      {@required BuildContext context,
+        User user}) {
+
+    return ChangeNotifierProvider(
+      create: (_) {
+        final viewModel= serviceLocator<HomeViewModel>();
+        viewModel.initData(user);
+        return viewModel;
+      },
+      child: HomeScreen._(),
+    );
+  }
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-
-  static final _logger= getLogger((_HomeScreenState).toString());
-
-
-  TabController tabController;
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  static final _logger = getLogger((_HomeScreenState).toString());
 
   @override
   void initState() {
     super.initState();
-    tabController= TabController(length: widget._viewModel.pages.length, vsync: this);
-    tabController.addListener(() {
-      if (!tabController.indexIsChanging) {
-        print('..........................${tabController.index}');
-        widget._viewModel.setPage(tabController.index);
-      }
-    });
+
+    HomeViewModel viewModel =
+    Provider.of<HomeViewModel>(context, listen: false);
+
+    viewModel.initUi(this);
 
   }
 
   @override
   void dispose() {
-    tabController.dispose();
-    widget._viewModel.dispose();
+    HomeViewModel viewModel =
+    Provider.of<HomeViewModel>(context, listen: false);
+    viewModel.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     HomeScreen._logger.d('build...');
+
     HomeViewModel viewModel =
-        Provider.of<HomeViewModel>(context, listen: false);
+        Provider.of<HomeViewModel>(context);
 
     return Scaffold(
       extendBody: true,
-        backgroundColor: Palette.white,
-        appBar: AppBar(
-          backgroundColor: Palette.ldaColor,
-          title: Consumer<ValueNotifier<HomePage>>(
-            builder: (_, homePage, __) => Text(homePage.value.title, style: TextStyle(color: Palette.white),),
+      backgroundColor: Palette.white,
+      appBar: AppBar(
+        backgroundColor: Palette.ldaColor,
+        title: Text(
+          viewModel.page.title,
+            style: TextStyle(color: Palette.white),
           ),
         ),
-        body: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          children: [_getTeamView(widget._user), HolidaysScreen(), AbsencesScreen()],
-          scrollDirection: Axis.horizontal,
-          controller: widget._viewModel.homePageController,
-        ),
-        bottomNavigationBar: HomeRoundedNavigationBar(
-          controller: tabController,
-          tabs: widget._viewModel.pages.map((e) => Tab(
-            icon: Icon(IconsMap.icons[e.icon]),
-          )).toList(),
-        ),
-      );
+      body: PageView(
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          _getTeamView(context, viewModel.user),
+          HolidaysScreen(),
+          AbsencesScreen()
+        ],
+        scrollDirection: Axis.horizontal,
+        controller: viewModel.homePageController,
+      ),
+      bottomNavigationBar: HomeRoundedNavigationBar(
+        controller: viewModel.tabController,
+        tabs: viewModel.pages
+            .map((e) => Tab(
+                  icon: Icon(IconsMap.icons[e.icon]),
+                ))
+            .toList(),
+      ),
+    );
   }
 
-  Widget _getTeamView(User user) {
+  Widget _getTeamView(BuildContext context, User user) {
     /*final viewModel = serviceLocator<TeamViewModel>();
     _logger.d('Se ha creado el viewModel TeamViewModel con hash ${viewModel.hashCode}');
     return MultiProvider(
@@ -95,8 +109,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             value: viewModel.members),
       ],
     );*/
-    return TeamScreen(serviceLocator<TeamViewModel>(), user);
+    return TeamScreen.getTeamScreen(context: context, user: user);
   }
-
-
 }

@@ -8,6 +8,8 @@ class DeleteAvatarFromCacheUserCase {
 
   DeleteAvatarFromCacheUserCase(this._avatarRepository);
 
-  Future<void> call(File avatar) => _avatarRepository.removeAvatarFromCache(avatar);
+  Future<void> call(File avatar) async {
+    await _avatarRepository.removeAvatarFromCache(avatar);
+  }
 
 }

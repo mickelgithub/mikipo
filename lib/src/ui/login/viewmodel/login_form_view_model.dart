@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mikipo/src/domain/entity/organization/area.dart';
 import 'package:mikipo/src/domain/entity/organization/department.dart';
 import 'package:mikipo/src/domain/entity/organization/heigh_profile.dart';
@@ -9,77 +11,88 @@ import 'package:flutter/material.dart';
 
 class LoginFormViewModel with Validators {
 
-  TextEditingController editEmailController= TextEditingController();
-  TextEditingController editPassController= TextEditingController();
-  TextEditingController editConfirmPassController= TextEditingController();
+  TextEditingController editEmailController = TextEditingController();
+  TextEditingController editPassController = TextEditingController();
+  TextEditingController editConfirmPassController = TextEditingController();
 
-  final BehaviorSubject<String> _emailController= BehaviorSubject<String>();
+  final BehaviorSubject<String> _emailController = BehaviorSubject<String>();
   Stream<String> get email => _emailController.stream.transform(validateEmail);
 
-  final BehaviorSubject<String> _passController= BehaviorSubject<String>();
+  final BehaviorSubject<String> _passController = BehaviorSubject<String>();
   Stream<String> get pass => _passController.stream.transform(validatePass);
 
-  final BehaviorSubject<Section> _sectionController= BehaviorSubject<Section>();
+  final BehaviorSubject<File> _avatarController = BehaviorSubject<File>();
+  Stream<File> get avatar => _avatarController.stream;
+  File getAvatarValue() => _avatarController.value;
+
+  final BehaviorSubject<Section> _sectionController =
+      BehaviorSubject<Section>();
   Stream<Section> get section => _sectionController.stream;
+  Section getSectionValue() => _sectionController.value;
 
-  Section getSection() => _sectionController.value;
-
-  final BehaviorSubject<HeighProfile> _heighProfileController= BehaviorSubject<HeighProfile>();
+  final BehaviorSubject<HeighProfile> _heighProfileController =
+      BehaviorSubject<HeighProfile>();
   Stream<HeighProfile> get heighProfiles => _heighProfileController.stream;
+  HeighProfile getHeighProfileValue() => _heighProfileController.value;
 
-  HeighProfile getHeighProfile() => _heighProfileController.value;
-
-  final BehaviorSubject<Area> _areaController= BehaviorSubject<Area>();
+  final BehaviorSubject<Area> _areaController = BehaviorSubject<Area>();
   Stream<Area> get area => _areaController.stream;
+  Area getAreaValue() => _areaController.value;
 
-  Area getArea() => _areaController.value;
-
-  final BehaviorSubject<Department> _departmentController= BehaviorSubject<Department>();
+  final BehaviorSubject<Department> _departmentController =
+      BehaviorSubject<Department>();
   Stream<Department> get department => _departmentController.stream;
+  Department getDepartmentValue() => _departmentController.value;
 
-  Department getDepartment() => _departmentController.value;
+  final BehaviorSubject<String> _confirmPassController =
+      BehaviorSubject<String>();
+  Stream<String> get confirmPass =>
+      _confirmPassController.stream.transform(validatePass);
 
-  final BehaviorSubject<String> _confirmPassController= BehaviorSubject<String>();
-  Stream<String> get confirmPass => _confirmPassController.stream.transform(validatePass);
+  Stream<bool> get submitLogin =>
+      Rx.combineLatest2<String, String, bool>(email, pass, (_, __) => true);
+  Stream<bool> get submitLogup =>
+      Rx.combineLatest3<String, String, String, bool>(
+          email, pass, confirmPass, (_, __, ___) => true);
 
-  Stream<bool> get submitLogin => Rx.combineLatest2<String,String, bool>(email, pass, (_,__) => true);
-  Stream<bool> get submitLogup => Rx.combineLatest3<String,String,String, bool>(email, pass, confirmPass, (_,__, ___) => true);
-
-  Stream<bool> get registrationReady => Rx.combineLatest4<HeighProfile,Section,Area,Department, bool>(heighProfiles, section, area, department, (h, s,a,d) {
-    if (h.level== HeighProfile.DIRECTOR) {
-      return s!= null;
-    } else if (h.level== HeighProfile.AREA_CHEF) {
-      return s!= null && a!= null;
-    } else {
-      return s != null && a != null && d != null;
-    }
-  });
+  Stream<bool> get isJobProfileFormCompleted =>
+      Rx.combineLatest4<HeighProfile, Section, Area, Department, bool>(
+          heighProfiles, section, area, department, (h, s, a, d) {
+        if (h.level == HeighProfile.DIRECTOR) {
+          return s != null;
+        } else if (h.level == HeighProfile.AREA_CHEF) {
+          return s != null && a != null;
+        } else {
+          return s != null && a != null && d != null;
+        }
+      });
 
   Function(String) get changeEmail => _emailController.sink.add;
   Function(String) get changePass => _passController.sink.add;
   Function(String) get changeConfirmPass => _confirmPassController.sink.add;
-  Function(HeighProfile) get changeHeighProfile => _heighProfileController.sink.add;
+  Function(HeighProfile) get changeHeighProfile =>
+      _heighProfileController.sink.add;
   Function(Section) get changeSection => _sectionController.sink.add;
   Function(Area) get changeArea => _areaController.sink.add;
   Function(Department) get changeDepartment => _departmentController.sink.add;
-
+  Function(File) get changeAvatar => _avatarController.sink.add;
 
   void clearEmailField() {
-    if (editEmailController.value.text.length> 0) {
+    if (editEmailController.value.text.length > 0) {
       editEmailController.clear();
       _emailController.sink.addError('');
     }
   }
 
   void clearPassField() {
-    if (editPassController.value.text.length> 0) {
+    if (editPassController.value.text.length > 0) {
       editPassController.clear();
       _passController.sink.addError('');
     }
   }
 
   void clearConfirmPassField() {
-    if (editConfirmPassController.value.text.length> 0) {
+    if (editConfirmPassController.value.text.length > 0) {
       editConfirmPassController.clear();
       _confirmPassController.sink.addError('');
     }
@@ -87,7 +100,7 @@ class LoginFormViewModel with Validators {
 
   bool isEqualPassAndConfirmPass() {
     print('${_passController.value}:${_confirmPassController.value}');
-    return _passController.value== _confirmPassController.value;
+    return _passController.value == _confirmPassController.value;
   }
 
   void showErrorInConfirmPass(String error) {
@@ -99,28 +112,32 @@ class LoginFormViewModel with Validators {
     _emailController.close();
     _passController.close();
     _confirmPassController.close();
+    _avatarController.close();
     editPassController.dispose();
     editConfirmPassController.dispose();
+    _departmentController.close();
+    _areaController.close();
+    _heighProfileController.close();
+    _sectionController.close();
   }
 
   bool isDirector() {
-    return _heighProfileController.value.level== HeighProfile.DIRECTOR;
+    return _heighProfileController.value.level == HeighProfile.DIRECTOR;
   }
 
   bool isAreaChef() {
-    return _heighProfileController.value.level== HeighProfile.AREA_CHEF;
+    return _heighProfileController.value.level == HeighProfile.AREA_CHEF;
   }
 
   bool isHeighProfileHasChanged(HeighProfile heighProfile) {
-    return _heighProfileController.value!= heighProfile;
+    return _heighProfileController.value != heighProfile;
   }
 
   bool isSectionHasChanged(Section section) {
-    return _sectionController.value!= section;
+    return _sectionController.value != section;
   }
 
   bool isAreaHasChanged(Area area) {
-    return _areaController.value!= area;
+    return _areaController.value != area;
   }
-
 }

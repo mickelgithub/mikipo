@@ -1,6 +1,12 @@
 class CustomException implements Exception {
 
-  final String message;
+  final CustomCause cause;
 
-  CustomException(this.message);
+  CustomException(this.cause);
+}
+
+enum CustomCause {
+  userNotFound,
+  notifRecipientIncorrect,
+  errorNotControlled
 }

@@ -20,41 +20,33 @@ class OrganizationRemoteDatasourceImpl implements IOrganizationRemoteDatasource 
   OrganizationRemoteDatasourceImpl(this._firebaseFirestore);
 
   @override
-  Future<OrganizationInfo> getOrganizationInfo() async {
+  Future<OrganizationInfo> getOrganizationInfo({bool fromServer= true}) async {
     _logger.d('Vamos a traer la info de la organization!!!!!!!!!!!!!!!!!!!!!!!!');
     List<Section> sectionsResult = [];
     List<HeighProfile> heighProfilesResult = [];
     Query query = _firebaseFirestore.collection(_ORGANIZATION_COLLECTION);
-    try {
-      await query.get().then((querySnapshot) async {
-        List<dynamic> sections = querySnapshot.docs[0].data()[_SECTIONS_COLLECTION];
-        List<dynamic> heighProfiles = querySnapshot.docs[0].data()[_HEIGH_PROFILES_COLLECTION];
-        sections.forEach((element) {
-          Section section = Section.fromMap({
-            Section.ID: element[Section.ID],
-            Section.NAME: element[Section.NAME],
-            Section.ICON: element[Section.ICON],
-            Section.AREAS: element[Section.AREAS]
-          });
-          sectionsResult.add(section);
+
+    await query.get(fromServer ? GetOptions(source: Source.server) : null).then((querySnapshot) async {
+      List<dynamic> sections = querySnapshot.docs[0].data()[_SECTIONS_COLLECTION];
+      List<dynamic> heighProfiles = querySnapshot.docs[0].data()[_HEIGH_PROFILES_COLLECTION];
+      sections.forEach((element) {
+        Section section = Section.fromMap({
+          Section.ID: element[Section.ID],
+          Section.NAME: element[Section.NAME],
+          Section.ICON: element[Section.ICON],
+          Section.AREAS: element[Section.AREAS]
         });
-        heighProfiles.forEach((element) {
-          HeighProfile heighProfile= HeighProfile.fromMap({
-            HeighProfile.ID: element[HeighProfile.ID],
-            HeighProfile.NAME: element[HeighProfile.NAME],
-            HeighProfile.LEVEL: element[HeighProfile.LEVEL]
-          });
-          heighProfilesResult.add(heighProfile);
-        });
+        sectionsResult.add(section);
       });
-    } on FirebaseException catch (e) {
-      _logger.e(e);
-      if (e.code == 'permission-denied') {
-        //el usuario no tiene permisos...
-      }
-    } on Exception catch (ee) {
-      _logger.e(ee);
-    }
+      heighProfiles.forEach((element) {
+        HeighProfile heighProfile= HeighProfile.fromMap({
+          HeighProfile.ID: element[HeighProfile.ID],
+          HeighProfile.NAME: element[HeighProfile.NAME],
+          HeighProfile.LEVEL: element[HeighProfile.LEVEL]
+        });
+        heighProfilesResult.add(heighProfile);
+      });
+    });
     return OrganizationInfo(sections: sectionsResult, heighProfiles: heighProfilesResult);
   }
 }

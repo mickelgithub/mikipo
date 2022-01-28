@@ -27,7 +27,7 @@ class _$UserTearOff {
       Area area,
       Department department,
       bool isEmailVerified,
-      bool isAcceptedByChef,
+      String isAcceptedByChef,
       String notificationKey,
       String state}) {
     return _User(
@@ -68,7 +68,7 @@ mixin _$User {
   Area get area;
   Department get department;
   bool get isEmailVerified;
-  bool get isAcceptedByChef;
+  String get isAcceptedByChef;
   String get notificationKey;
   String get state;
 
@@ -93,7 +93,7 @@ abstract class $UserCopyWith<$Res> {
       Area area,
       Department department,
       bool isEmailVerified,
-      bool isAcceptedByChef,
+      String isAcceptedByChef,
       String notificationKey,
       String state});
 
@@ -151,7 +151,7 @@ class _$UserCopyWithImpl<$Res> implements $UserCopyWith<$Res> {
           : isEmailVerified as bool,
       isAcceptedByChef: isAcceptedByChef == freezed
           ? _value.isAcceptedByChef
-          : isAcceptedByChef as bool,
+          : isAcceptedByChef as String,
       notificationKey: notificationKey == freezed
           ? _value.notificationKey
           : notificationKey as String,
@@ -218,7 +218,7 @@ abstract class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
       Area area,
       Department department,
       bool isEmailVerified,
-      bool isAcceptedByChef,
+      String isAcceptedByChef,
       String notificationKey,
       String state});
 
@@ -281,7 +281,7 @@ class __$UserCopyWithImpl<$Res> extends _$UserCopyWithImpl<$Res>
           : isEmailVerified as bool,
       isAcceptedByChef: isAcceptedByChef == freezed
           ? _value.isAcceptedByChef
-          : isAcceptedByChef as bool,
+          : isAcceptedByChef as String,
       notificationKey: notificationKey == freezed
           ? _value.notificationKey
           : notificationKey as String,
@@ -334,7 +334,7 @@ class _$_User implements _User {
   @override
   final bool isEmailVerified;
   @override
-  final bool isAcceptedByChef;
+  final String isAcceptedByChef;
   @override
   final String notificationKey;
   @override
@@ -428,7 +428,7 @@ abstract class _User implements User {
       Area area,
       Department department,
       bool isEmailVerified,
-      bool isAcceptedByChef,
+      String isAcceptedByChef,
       String notificationKey,
       String state}) = _$_User;
 
@@ -457,7 +457,7 @@ abstract class _User implements User {
   @override
   bool get isEmailVerified;
   @override
-  bool get isAcceptedByChef;
+  String get isAcceptedByChef;
   @override
   String get notificationKey;
   @override

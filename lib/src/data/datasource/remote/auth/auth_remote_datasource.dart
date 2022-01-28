@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meta/meta.dart';
 
 abstract class IAuthRemoteDatasource {
-
-  void refreshUserToken({@required String email, @required String pass});
+  Future<void> refreshUserToken(
+      {@required String email, @required String pass});
 
   Stream<User> get firebaseUser;
 
@@ -11,4 +11,12 @@ abstract class IAuthRemoteDatasource {
   Future<User> refreshUser();
   Future<User> loginUser({@required String email, @required String pass});
 
+  Future<void> deleteUser();
+  Future<void> logoutUser();
+
+  bool get isUserAuthenticated;
+
+  String get userId;
+
+  Future<bool> get isEmailVerified;
 }

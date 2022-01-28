@@ -3,23 +3,21 @@ import 'package:mikipo/src/domain/usecase/team/get_team_members_usecase.dart';
 import 'package:mikipo/src/domain/entity/auth/user.dart';
 import 'package:flutter/foundation.dart';
 
-
-class TeamViewModel {
-
+class TeamViewModel with ChangeNotifier {
   final GetTeamMembersUseCase _getTeamMembersUseCase;
   final AcceptDenyMemberUseCase _acceptDenyMemberUseCase;
 
   TeamViewModel(this._getTeamMembersUseCase, this._acceptDenyMemberUseCase);
 
-  ValueNotifier<List<User>> members= ValueNotifier(null);
+  List<User> members;
+
+  User _user;
+  User get user => _user;
 
   void init(User user) async {
-    //members.value= members.value!= null ? members.value : await _getTeamMembers(user);
-    members= ValueNotifier(null);
-    members.value= await _getTeamMembers(user);
-    print('hola');
+    this._user= user;
+    members = await _getTeamMembers(user);
   }
-
 
   Future<List<User>> _getTeamMembers(User user) async {
     return await _getTeamMembersUseCase(user);
@@ -27,12 +25,18 @@ class TeamViewModel {
 
   //the chef has accepted a member
   void accept({@required User chef, @required User member}) async {
-    await _acceptDenyMemberUseCase(chef: chef, member: member);
+    await _acceptDenyMemberUseCase(chef: chef, member: member, accept: true);
+    /*List<User> users = [...members.value];
+    final memberAccepted =
+        member.copyWith(isAcceptedByChef: StringConstants.YES);
+    final index = users.indexOf(member);
+    users.insert(index, memberAccepted);
+    users.removeAt(index + 1);
+    members.value = users;*/
   }
 
   //the chef has denied a member
-  void deny({@required User chef, @required User member}) {
-    print('deny....');
+  void deny({@required User chef, @required User member}) async {
+    await _acceptDenyMemberUseCase(chef: chef, member: member, accept: false);
   }
-
 }

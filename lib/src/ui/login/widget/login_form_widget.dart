@@ -6,105 +6,97 @@ import 'package:mikipo/src/domain/entity/organization/heigh_profile.dart';
 import 'package:mikipo/src/domain/entity/organization/section.dart';
 import 'package:mikipo/src/ui/common/colors.dart';
 import 'package:mikipo/src/ui/common/component/input_text_widget.dart';
-import 'package:mikipo/src/ui/login/login_screen.dart';
 import 'package:mikipo/src/ui/login/viewmodel/login_view_model.dart';
+import 'package:mikipo/src/util/constants/size_constants.dart';
 import 'package:mikipo/src/util/icon/icons_map.dart';
 import 'package:mikipo/src/util/log/simple_log_printer.dart';
 import 'package:provider/provider.dart';
 
 class LoginFormWidget extends StatelessWidget {
+  static const String _LOADING = 'Cargando...';
+  static const String _PASS_HINT = 'Contraseña';
+  static const String _CONFIRM_PASS_HINT = 'Confirmar contraseña';
+  static const String _PICK_SECTION = 'Elige tu seccion';
+  static const String _PICK_PROFILE = 'Elige tu perfil';
+  static const String _PICK_AREA = 'Elige tu area';
+  static const String _PICK_DEPARTMENT = 'Elige tu departamente';
+  static const String _NOT_AVAILABLE = 'No disponible';
+  static const String _LOGIN = 'ACCEDER';
+  static const String _LOGUP = 'REGISTRARSE';
 
-  static const String _LOADING= 'Cargando...';
-  static const String _PASS_HINT= 'Contraseña';
-  static const String _CONFIRM_PASS_HINT= 'Confirmar contraseña';
-  static const String _PICK_SECTION= 'Elige tu seccion';
-  static const String _PICK_PROFILE= 'Elige tu perfil';
-  static const String _PICK_AREA= 'Elige tu area';
-  static const String _PICK_DEPARTMENT= 'Elige tu departamente';
-  static const String _NOT_AVAILABLE= 'No disponible';
-  static const String _LOGIN= 'ACCEDER';
-  static const String _LOGUP= 'REGISTRARSE';
-
-
-  static final _logger= getLogger((LoginFormWidget).toString());
+  static final _logger = getLogger((LoginFormWidget).toString());
 
   const LoginFormWidget();
 
   @override
   Widget build(BuildContext context) {
-    _logger.d('build...');
+    _logger.d('build...LoginFormWidget$hashCode');
     final size = MediaQuery.of(context).size;
-    double topBackHeight = size.height * HEADER_HEIGHT_FACTOR;
+    double topBackHeight = size.height * SizeConstants.HEADER_HEIGHT_FACTOR;
     LoginViewModel viewModel =
         Provider.of<LoginViewModel>(context, listen: false);
 
-    return Consumer6<
-            ValueNotifier<LoginLogupAction>,
-            ValueNotifier<KeyBoardState>,
-            ValueNotifier<RegistrationStep>,
-            ValueNotifier<List<Section>>,
-            ValueNotifier<List<Area>>,
-            ValueNotifier<List<Department>>>(
-        builder: (context, action, keyBoardState, registrationStep,
-            sections, areas, departments, _) {
+    /*return Selector<
+        LoginViewModel,
+        Tuple6<LoginLogupOperation, RegistrationStep,
+            List<HeighProfile>, List<Section>, List<Area>, List<Department>>>(
+      selector: (_, loginViewModel) => Tuple6(
+          loginViewModel.operation,
+          loginViewModel.registrationStep,
+          loginViewModel.heighProfiles,
+          loginViewModel.sections,
+          loginViewModel.areas,
+          loginViewModel.departments),
+      builder: (_, data, __) {
+        final loginLogupAction = data.value1;
+        final registrationStep = data.value2;
+        final heighProfiles = data.value3;
+        final sections = data.value4;
+        final areas = data.value5;
+        final departments = data.value6;
+        final FocusScopeNode node = FocusScopeNode();
 
-          return Consumer<ValueNotifier<List<HeighProfile>>>(
-            builder: (context2, heighProfiles, __) {
-              final FocusScopeNode node = FocusScopeNode();
-              if (keyBoardState.value == KeyBoardState.closed) {
-                SystemChrome.setEnabledSystemUIOverlays([]);
-              }
-              return AnimatedPositioned(
-                duration: Duration(milliseconds: ANIM_DURATION),
-                top: topBackHeight -
-                    FORM_OFFSET_UP -
-                    (keyBoardState.value == KeyBoardState.opened
-                        ? FORM_TRANSLATION_Y
-                        : 0),
-                left: 0,
-                right: 0,
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: ANIM_DURATION),
-                  margin: EdgeInsets.symmetric(horizontal: 16.0),
-                  padding: EdgeInsets.only(top: 16.0),
-                  decoration: BoxDecoration(
-                    color: Palette.ldaColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(16),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Palette.black.withOpacity(0.5),
-                        blurRadius: 5.0,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  height: action.value == LoginLogupAction.logup
-                      ? FORM_LOGUP_HEIGHT
-                      : FORM_LOGIN_HEIGHT,
-                  child: _getForm(
-                      size,
-                      viewModel,
-                      node,
-                      action.value,
-                      registrationStep.value,
-                      sections.value,
-                      heighProfiles.value,
-                      areas.value,
-                      departments.value),
+        return AnimatedPositioned(
+          duration: Duration(milliseconds: ANIM_DURATION),
+          top: topBackHeight -
+              FORM_OFFSET_UP - 0,
+              //(keyBoardState == KeyBoardState.opened ? FORM_TRANSLATION_Y : 0),
+          left: 0,
+          right: 0,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: ANIM_DURATION),
+            margin: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.only(top: 16.0),
+            decoration: BoxDecoration(
+              color: Palette.ldaColor,
+              borderRadius: BorderRadius.all(
+                Radius.circular(16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Palette.black.withOpacity(0.5),
+                  blurRadius: 5.0,
+                  offset: Offset(0, 5),
                 ),
-              );
-            }
-          );
-    });
+              ],
+            ),
+            height: loginLogupAction == LoginLogupOperation.login
+                ? FORM_LOGIN_HEIGHT
+                : FORM_LOGUP_HEIGHT,
+            child: _getForm(size, viewModel, node, loginLogupAction,
+                registrationStep, sections, heighProfiles, areas, departments),
+          ),
+        );
+      },
+    );*/
+    return Container();
   }
 
   Widget _getForm(
       Size size,
       LoginViewModel viewModel,
       FocusScopeNode node,
-      LoginLogupAction action,
+      LoginLogupOperation action,
       RegistrationStep registrationStep,
       List<Section> sections,
       List<HeighProfile> heighProfiles,
@@ -129,9 +121,9 @@ class LoginFormWidget extends StatelessWidget {
                   SizedBox(
                     height: 5,
                   ),
-                    _getPassInput(
-                        registrationStep, size, viewModel, action, node),
-                  if (action == LoginLogupAction.logup) ...[
+                  _getPassInput(
+                      registrationStep, size, viewModel, action, node),
+                  if (action == LoginLogupOperation.logup) ...[
                     SizedBox(
                       height: 5,
                     ),
@@ -143,13 +135,12 @@ class LoginFormWidget extends StatelessWidget {
                 ],
                 //the second page
                 if (registrationStep == RegistrationStep.end) ...[
-                  _getHeighProfileInput(registrationStep, size,
-                      viewModel, heighProfiles),
+                  _getHeighProfileInput(
+                      registrationStep, size, viewModel, heighProfiles),
                   SizedBox(
                     height: 10,
                   ),
-                  _getSectionInput(
-                      registrationStep, size, viewModel, sections),
+                  _getSectionInput(registrationStep, size, viewModel, sections),
                   SizedBox(
                     height: 10,
                   ),
@@ -207,7 +198,7 @@ class LoginFormWidget extends StatelessWidget {
       RegistrationStep registrationStep,
       Size size,
       LoginViewModel viewModel,
-      LoginLogupAction action,
+      LoginLogupOperation action,
       FocusScopeNode node) {
     return TweenAnimationBuilder(
       duration: Duration(milliseconds: 1200),
@@ -230,8 +221,8 @@ class LoginFormWidget extends StatelessWidget {
           iconData: Icons.lock,
           onChanged: viewModel.loginFormViewModel.changePass,
           error: snapshot.error,
-          isDone: action == LoginLogupAction.login,
-          moveFocusTwice: action == LoginLogupAction.logup,
+          isDone: action == LoginLogupOperation.login,
+          moveFocusTwice: action == LoginLogupOperation.logup,
           node: node,
           isPass: true,
           controller: viewModel.loginFormViewModel.editPassController,
@@ -255,7 +246,7 @@ class LoginFormWidget extends StatelessWidget {
         return Transform(
           child: child,
           transform:
-          Matrix4.translationValues(-animation * size.width, 0.0, 0.0),
+              Matrix4.translationValues(-animation * size.width, 0.0, 0.0),
         );
       },
       child: StreamBuilder(
@@ -301,27 +292,27 @@ class LoginFormWidget extends StatelessWidget {
                     items: sections == null
                         ? null
                         : sections
-                        .map(
-                          (section) => DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            Icon(
-                              IconsMap.icons[section.icon],
-                              color: Palette.white,
-                            ),
-                            SizedBox(
-                              width: 8.0,
-                            ),
-                            Text(
-                              section.name,
-                              style: TextStyle(color: Palette.white),
-                            ),
-                          ],
-                        ),
-                        value: section,
-                      ),
-                    )
-                        .toList(),
+                            .map(
+                              (section) => DropdownMenuItem(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      IconsMap.icons[section.icon],
+                                      color: Palette.white,
+                                    ),
+                                    SizedBox(
+                                      width: 8.0,
+                                    ),
+                                    Text(
+                                      section.name,
+                                      style: TextStyle(color: Palette.white),
+                                    ),
+                                  ],
+                                ),
+                                value: section,
+                              ),
+                            )
+                            .toList(),
                     onChanged: viewModel.changeSection),
               ),
             ),
@@ -608,7 +599,7 @@ class LoginFormWidget extends StatelessWidget {
       LoginViewModel viewModel,
       FocusScopeNode node) {
     return TweenAnimationBuilder(
-      onEnd: viewModel.moveStepToEnd,
+      //onEnd: viewModel.moveStepToEnd,
       duration: Duration(milliseconds: 800),
       curve: Curves.ease,
       tween: Tween<double>(
@@ -636,98 +627,104 @@ class LoginFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _getFormActions(LoginViewModel viewModel, LoginLogupAction action,
+  Widget _getFormActions(LoginViewModel viewModel, LoginLogupOperation action,
       RegistrationStep registrationStep) {
-    return Row(
-      //mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Expanded(
-          child: TweenAnimationBuilder(
-            duration: Duration(milliseconds: 1000),
-            curve: Curves.ease,
-            tween: Tween<double>(
-              begin: 1.0,
-              end: registrationStep == RegistrationStep.end ? 0.0 : 1.0),
-            builder: (_, animation, child) {
-              return Opacity(
-                child: child,
-                opacity: animation);
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    viewModel.onChangeAction(LoginLogupAction.login);
+    /*return action != LoginLogupOperation.updateProfile
+        ? Row(
+            //mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: TweenAnimationBuilder(
+                  duration: Duration(milliseconds: 1000),
+                  curve: Curves.ease,
+                  tween: Tween<double>(
+                      begin: 1.0,
+                      end:
+                          registrationStep == RegistrationStep.end ? 0.0 : 1.0),
+                  builder: (_, animation, child) {
+                    return Opacity(child: child, opacity: animation);
                   },
-                  child: Text(
-                    _LOGIN,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: action == LoginLogupAction.login
-                            ? Palette.white
-                            : Colors.grey[400]),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          viewModel.onChangeOperation(LoginLogupOperation.login);
+                        },
+                        child: Text(
+                          _LOGIN,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: action == LoginLogupOperation.login
+                                  ? Palette.white
+                                  : Colors.grey[400]),
+                        ),
+                      ),
+                      if (action == LoginLogupOperation.login) ...[
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          width: 60,
+                          height: 2,
+                          color: Palette.white,
+                        ),
+                      ]
+                    ],
                   ),
                 ),
-                if (action == LoginLogupAction.login) ...[
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    width: 60,
-                    height: 2,
-                    color: Palette.white,
-                  ),
-                ]
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: TweenAnimationBuilder(
-            duration: Duration(milliseconds: 1600),
-            curve: Curves.bounceOut,
-            tween: Tween<double>(
-                begin: 0.0,
-                end: registrationStep == RegistrationStep.end ? 1.0 : 0.0),
-            builder: (_, animation, child) {
-              return Transform(
-                child: child,
-                transform:
-                Matrix4.translationValues(animation * -80, animation * 10, 0.0),
-              );
-            },
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    viewModel.onChangeAction(LoginLogupAction.logup);
+              ),
+              Expanded(
+                child: TweenAnimationBuilder(
+                  duration: Duration(milliseconds: 1600),
+                  curve: Curves.bounceOut,
+                  tween: Tween<double>(
+                      begin: 0.0,
+                      end:
+                          registrationStep == RegistrationStep.end ? 1.0 : 0.0),
+                  builder: (_, animation, child) {
+                    return Transform(
+                      child: child,
+                      transform: Matrix4.translationValues(
+                          animation * -80, animation * 10, 0.0),
+                    );
                   },
-                  child: Text(
-                    _LOGUP,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: action == LoginLogupAction.logup
-                            ? Palette.white
-                            : Colors.grey[400]),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          viewModel.onChangeOperation(LoginLogupOperation.logup);
+                        },
+                        child: Text(
+                          _LOGUP,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: action == LoginLogupOperation.logup
+                                  ? Palette.white
+                                  : Colors.grey[400]),
+                        ),
+                      ),
+                      if (action == LoginLogupOperation.logup) ...[
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          width: 60,
+                          height: 2,
+                          color: Palette.white,
+                        ),
+                      ]
+                    ],
                   ),
                 ),
-                if (action == LoginLogupAction.logup) ...[
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    width: 60,
-                    height: 2,
-                    color: Palette.white,
-                  ),
-                ]
-              ],
-            ),
-          ),
-        )
-      ],
-    );
+              )
+            ],
+          )
+        : Center(
+            child: Text('Actualizar tu perfile',
+                style: TextStyle(fontSize: 20.0, color: Palette.white)),
+          );*/
+    return Container();
   }
 }

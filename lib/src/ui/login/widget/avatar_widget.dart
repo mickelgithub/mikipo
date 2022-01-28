@@ -3,44 +3,69 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mikipo/src/ui/common/colors.dart';
-import 'package:mikipo/src/ui/login/login_screen.dart';
-import 'package:mikipo/src/ui/login/viewmodel/login_view_model.dart';
+import 'package:mikipo/src/util/constants/size_constants.dart';
 import 'package:mikipo/src/util/log/simple_log_printer.dart';
-import 'package:provider/provider.dart';
 
 class AvatarWidget extends StatelessWidget {
+  static final _logger = getLogger((AvatarWidget).toString());
 
-  static final _logger= getLogger((AvatarWidget).toString());
+  static const double AVATAR_SIZE = 70;
 
   final VoidCallback onAvatarClick;
+  final File avatar;
 
-  const AvatarWidget({Key key, @required this.onAvatarClick}) : super(key: key);
+  const AvatarWidget({Key key, @required this.onAvatarClick, this.avatar})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    _logger.d('build...');
+    _logger.d('build...AvatarWidget$hashCode');
+
     final size = MediaQuery.of(context).size;
-    double topBackHeight = size.height * HEADER_HEIGHT_FACTOR;
+    double topBackHeight = size.height * SizeConstants.HEADER_HEIGHT_FACTOR;
 
-    return Consumer3<ValueNotifier<LoginLogupAction>,
-        ValueNotifier<KeyBoardState>, ValueNotifier<File>>(
-      builder: (context, action, keyboardState, avatar, _) {
+    return Container();
 
+    /*return Selector<LoginViewModel, LoginLogupAction>(
+      selector: (_, loginViewModel) => loginViewModel.operation,
+      builder: (_, loginLogupAction, __) {
         double translation = topBackHeight -
             FORM_OFFSET_UP -
-            AVATAR_SIZE / 2 -
-            (keyboardState.value == KeyBoardState.opened ? FORM_TRANSLATION_Y : 0.0);
+            AVATAR_SIZE / 2;
+            //(keyboardState == KeyBoardState.opened ? FORM_TRANSLATION_Y : 0.0);
         return AnimatedPositioned(
           duration: Duration(milliseconds: ANIM_DURATION),
           top: translation,
           left: (size.width - AVATAR_SIZE) / 2,
-          child: action.value== LoginLogupAction.login ? _getAvatarForLogin(avatar.value) : _getAvatarForLogup(avatar.value, onAvatarClick),
+          child: loginLogupAction == LoginLogupAction.login
+              ? _getAvatarForLogin()
+              : _getAvatarForLogup(onAvatarClick),
         );
       },
-    );
+    );*/
+
+    /*return Consumer3<ValueNotifier<LoginLogupAction>,
+        ValueNotifier<KeyBoardState>, ValueNotifier<File>>(
+      builder: (context, action, keyboardState, avatar, _) {
+        double translation = topBackHeight -
+            FORM_OFFSET_UP -
+            AVATAR_SIZE / 2 -
+            (keyboardState.value == KeyBoardState.opened
+                ? FORM_TRANSLATION_Y
+                : 0.0);
+        return AnimatedPositioned(
+          duration: Duration(milliseconds: ANIM_DURATION),
+          top: translation,
+          left: (size.width - AVATAR_SIZE) / 2,
+          child: action.value == LoginLogupAction.login
+              ? _getAvatarForLogin(avatar.value)
+              : _getAvatarForLogup(avatar.value, onAvatarClick),
+        );
+      },
+    );*/
   }
 
-  Widget _getAvatarForLogup(File avatar, VoidCallback onAvatarClick) {
+  Widget _getAvatarForLogup(VoidCallback onAvatarClick) {
     return Stack(children: [
       Container(
         width: AVATAR_SIZE,
@@ -84,7 +109,7 @@ class AvatarWidget extends StatelessWidget {
     ]);
   }
 
-  Widget _getAvatarForLogin(File avatar) {
+  Widget _getAvatarForLogin() {
     return Container(
       width: AVATAR_SIZE,
       decoration: BoxDecoration(
@@ -97,6 +122,7 @@ class AvatarWidget extends StatelessWidget {
           color: Palette.white,
         ),
         iconSize: AVATAR_SIZE - 20,
+        onPressed: null,
       ),
     );
   }
